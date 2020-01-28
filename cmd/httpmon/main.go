@@ -1,7 +1,11 @@
 package main
 
-import "github.com/mike-neck/httpmon"
+import (
+	"fmt"
+	"github.com/mike-neck/httpmon"
+)
 
 func main() {
-	httpmon.Run()
+	m := httpmon.Run()
+	fmt.Println(m)
 }
