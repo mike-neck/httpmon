@@ -1,5 +1,4 @@
 package httpmon
 
-func Run() string {
-	return "hello"
+type HttpMon struct {
 }
