@@ -11,33 +11,22 @@ type Queries map[string][]string
 
 type HttpTestRequest interface {
 	Method() HttpMethod
-	Headers() HttpHeaders
 	URL() string
-	Queries() Queries
 }
 
-type TestResult int
+type TestResult interface {
+	IsSuccess() bool
+	Comparison() Comparison
+}
 
-const (
-	TestSuccess TestResult = iota
-	TestFailure
-)
+type Comparison struct {
+	ItemName string
+	Expect   interface{}
+	Actual   interface{}
+}
 
 type HttpStatus int
 
-type HttpHeaderName string
-
-type HttpHeaderValue string
-
-type HttpBodyTester func(body []byte) (result bool, err error)
-
 type HttpTest interface {
 	ExpectStatus(status HttpStatus) TestResult
-	ExpectHeader(name HttpHeaderName) HttpHeaderTest
-	ExpectBody(tester HttpBodyTester) TestResult
-}
-
-type HttpHeaderTest interface {
-	Exists() TestResult
-	HasValue(value HttpHeaderValue) TestResult
 }
