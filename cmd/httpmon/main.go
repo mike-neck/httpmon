@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	m := httpmon.Run()
-	fmt.Println(m)
+	t, _ := httpmon.TimeOutFromString("5s")
+	fmt.Println(t)
 }

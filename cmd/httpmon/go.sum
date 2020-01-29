@@ -1,0 +1,10 @@
+github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/mike-neck/httpmon v0.0.0-20200128125556-26d6b2ef4f1d h1:SIuu1NMuRzRhWBcRPrA+Em1t2PcaLeRxtTJS8xmIbHU=
+github.com/mike-neck/httpmon v0.0.0-20200128125556-26d6b2ef4f1d/go.mod h1:wYcIbX2IqS9b0lNmrGx3H5X+O8j+7PXglyZx+7YTZOg=
+github.com/mike-neck/httpmon v0.0.0-20200128152818-2501e3f2eb68 h1:vWMp+qyzc4EDBKKWUOtVZ9nN9GGEbwxEwl4La6V01RM=
+github.com/mike-neck/httpmon v0.0.0-20200128152818-2501e3f2eb68/go.mod h1:7MKCRdxTbPu5Cu2jhPtadCHGyEPNOC9vy6+6IeWrms8=
+github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
+github.com/stretchr/testify v1.4.0/go.mod h1:j7eGeouHqKxXV5pUuKE4zz7dFj8WfuZ+81PSLYec5m4=
+gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
+gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
