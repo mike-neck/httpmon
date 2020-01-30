@@ -5,11 +5,16 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type TimeOut struct {
 	Amount int
 	TimeUnit
+}
+
+func (out *TimeOut) AsTime() time.Duration {
+	return time.Duration(out.Amount) * out.ToDuration()
 }
 
 type TimeUnit int
@@ -19,6 +24,16 @@ const (
 	Seconds
 	Minutes
 )
+
+func (tu TimeUnit) ToDuration() time.Duration {
+	switch tu {
+	case Seconds:
+		return time.Second
+	case Minutes:
+		return time.Minute
+	}
+	return time.Duration(0)
+}
 
 var timeOutStringPattern = regexp.MustCompile("[smSM]$")
 
