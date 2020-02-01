@@ -10,7 +10,7 @@ jobs:
       matrix:
         os:
           - ubuntu-latest
-          - maxOS-latest
+          - macOS-latest
           - windows-latest
     steps:
       - name: Setup Golang Environment
