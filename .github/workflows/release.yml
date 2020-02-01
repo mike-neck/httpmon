@@ -30,5 +30,6 @@ jobs:
         run: |
           export CREATE_EVENT_REF_TYPE=$(jq --raw-output .ref_type "$GITHUB_EVENT_PATH")
           export TAGNAME=$(jq --raw-output .ref "$GITHUB_EVENT_PATH")
+          echo $TAG_NAME
           if [ "$CREATE_EVENT_REF_TYPE" != "tag" ]; then echo "ref_type is not a tag: ${CREATE_EVENT_REF_TYPE}" && exit 78; fi
           $GOPATH/bin/ghr -n ${TAG_NAME} -b "Release ${TAG_NAME}" -draft ${TAG_NAME} build/release/
