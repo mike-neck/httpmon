@@ -64,8 +64,8 @@ func createApplication(actionFactory ActionFactory) *cli.App {
 func runApplication(app *cli.App, arguments ...string) ExitCode {
 	err := app.Run(arguments)
 	if err != nil {
-		if _, ok := err.(*TestFailed); ok {
-			fmt.Println("test failed")
+		if e, ok := err.(*TestFailed); ok {
+			fmt.Println(e.Error())
 			return TestError
 		} else if e, ok := err.(*httpmon.UserInputError); ok {
 			fmt.Println(e.Error())

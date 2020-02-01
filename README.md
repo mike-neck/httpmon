@@ -9,17 +9,18 @@ usage
 #### An example of success case.
 
 ```shell-session
-$ httpmon https://example.com/api --status 200 --timeout 5s
+$ httpmon --status 200 --timeout 5s https://example.com/api
 ok
 ```
 
 #### An example of failure case.
 
 ```shell-session
-$ httpmon https://example.com/api --status 200 --timeout 5s
-failure
-  expect status: 200
-     got status: 503
+$ httpmon --status 200 --timeout 5s https://example.com/api
+status
+  expect: 200
+  actual: 503
+test failed: 1 failed in 1 cases
 ```
 
 supported methods
