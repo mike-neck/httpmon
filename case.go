@@ -2,8 +2,8 @@ package httpmon
 
 import "fmt"
 
-// RunTest runs http access test against given url, inspecting its response.
-func RunTest(method, URL, timout string, status int) ([]TestResult, error) {
+// RunTestCase runs http access test against given url, inspecting its response.
+func RunTestCase(method, URL, timout string, status int) ([]TestResult, error) {
 	caseRunner, err := NewCaseRunner(method, URL, timout)
 	if err != nil {
 		return nil, err
