@@ -1,17 +1,27 @@
 package httpmon
 
-type getTest struct {
-	targetURL string
+import "net/url"
+
+type request struct {
+	method    HttpMethod
+	targetURL url.URL
 }
 
-func (g *getTest) Method() HttpMethod {
-	return "GET"
+func (r *request) Method() HttpMethod {
+	return r.method
 }
 
-func (g *getTest) URL() string {
-	return g.targetURL
+func (r *request) URL() string {
+	return r.targetURL.String()
 }
 
-func NewGetRequest(URL string) HttpTestRequest {
-	return &getTest{targetURL: URL}
+func NewRequest(method HttpMethod, URL string) (HttpTestRequest, error) {
+	u, err := url.Parse(URL)
+	if err != nil {
+		return nil, err
+	}
+	return &request{
+		method:    method,
+		targetURL: *u,
+	}, nil
 }

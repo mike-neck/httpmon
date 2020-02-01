@@ -1,11 +1,50 @@
 package httpmon
 
+import (
+	"fmt"
+	"strings"
+)
+
 type HttpMon struct {
 	TimeOut
 	HttpClientFactory
 }
 
+func NewHttpMon(timeout string) (*HttpMon, error) {
+	timeOut, err := TimeOutFromString(timeout)
+	if err != nil {
+		return nil, err
+	}
+	factory := func(out TimeOut) HttpClient {
+		return DefaultHttpClient(out)
+	}
+	return &HttpMon{
+		TimeOut:           *timeOut,
+		HttpClientFactory: factory,
+	}, nil
+}
+
 type HttpMethod string
+
+const (
+	GET    HttpMethod = "GET"
+	POST   HttpMethod = "POST"
+	PUT    HttpMethod = "PUT"
+	DELETE HttpMethod = "DELETE"
+)
+
+func ToHttpMethod(input string) (*HttpMethod, error) {
+	method := HttpMethod(strings.ToUpper(input))
+	switch method {
+	case GET:
+		return &method, nil
+	case POST:
+	case PUT:
+	case DELETE:
+		return nil, fmt.Errorf("%s is not supported", method)
+	}
+	return nil, fmt.Errorf("unknown method: %s", method)
+}
 
 type HttpHeaders map[string][]string
 
@@ -51,7 +90,7 @@ type test struct {
 	status HttpStatus
 }
 
-func (t test) ExpectStatus(status HttpStatus) TestResult {
+func (t *test) ExpectStatus(status HttpStatus) TestResult {
 	return &httpStatusComparison{
 		result: t.status == status,
 		expect: status,

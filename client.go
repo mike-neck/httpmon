@@ -19,6 +19,13 @@ type HttpResponse interface {
 
 ////
 
+func DefaultHttpClient(out TimeOut) HttpClient {
+	client := http.Client{
+		Timeout: out.ToDuration(),
+	}
+	return &defaultHttpClient{delegate: client}
+}
+
 type defaultHttpClient struct {
 	delegate http.Client
 }
@@ -36,12 +43,6 @@ func (dhc *defaultHttpClient) Run(method HttpMethod, url string) (HttpResponse, 
 		body:       response.Body,
 		statusCode: response.StatusCode,
 	}, nil
-}
-
-var defaultHttpClientFactory HttpClientFactory = func(out TimeOut) HttpClient {
-	return &defaultHttpClient{delegate: http.Client{
-		Timeout: out.ToDuration(),
-	}}
 }
 
 type defaultHttpResponse struct {
