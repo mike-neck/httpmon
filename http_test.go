@@ -3,6 +3,7 @@ package httpmon
 import (
 	"fmt"
 	"github.com/stretchr/testify/assert"
+	"io"
 	"testing"
 )
 
@@ -30,8 +31,8 @@ var timeout TimeOut = TimeOut{
 type errorHttpClient struct {
 }
 
-func (ehc *errorHttpClient) Run(method HttpMethod, url string) (HttpResponse, error) {
-	return nil, fmt.Errorf("method: %s, url: %s", method, url)
+func (ech *errorHttpClient) Run(details HttpRequestDetails) (HttpResponse, error) {
+	return nil, fmt.Errorf("method: %s, url: %s", details.Method(), details.URL())
 }
 
 type testHttpTestRequest struct {
@@ -39,19 +40,27 @@ type testHttpTestRequest struct {
 	url    string
 }
 
+func (r *testHttpTestRequest) Body() io.Reader {
+	panic("implement me")
+}
+
+func (r *testHttpTestRequest) Headers() HttpHeaders {
+	panic("implement me")
+}
+
 func (r *testHttpTestRequest) Method() HttpMethod {
 	return HttpMethod(r.method)
 }
 
-func (r *testHttpTestRequest) URL() string {
-	return r.url
+func (r *testHttpTestRequest) URL() URL {
+	return URL(r.url)
 }
 
 type successHttpClient struct {
 	closeCalled bool
 }
 
-func (s *successHttpClient) Run(method HttpMethod, url string) (HttpResponse, error) {
+func (s *successHttpClient) Run(details HttpRequestDetails) (HttpResponse, error) {
 	return &successResponse{callback: func() {
 		s.closeCalled = true
 	}}, nil
