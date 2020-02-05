@@ -1,13 +1,12 @@
 package httpmon
 
 import (
-	"bytes"
 	"io"
 	"net/http"
 )
 
 type HttpClient interface {
-	Run(method HttpMethod, url string) (HttpResponse, error)
+	Run(builder HttpRequestDetails) (HttpResponse, error)
 }
 
 type HttpClientFactory func(out TimeOut) HttpClient
@@ -30,8 +29,8 @@ type defaultHttpClient struct {
 	delegate http.Client
 }
 
-func (dhc *defaultHttpClient) Run(method HttpMethod, url string) (HttpResponse, error) {
-	request, err := http.NewRequest(string(method), url, bytes.NewReader(make([]byte, 0)))
+func (dhc *defaultHttpClient) Run(details HttpRequestDetails) (HttpResponse, error) {
+	request, err := BuildRequest(details)
 	if err != nil {
 		return nil, err
 	}

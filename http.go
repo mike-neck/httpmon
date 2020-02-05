@@ -2,6 +2,8 @@ package httpmon
 
 import (
 	"fmt"
+	"io"
+	"net/http"
 	"strings"
 )
 
@@ -39,6 +41,7 @@ func ToHttpMethod(input string) (*HttpMethod, error) {
 	case GET:
 		return &method, nil
 	case POST:
+		return &method, nil
 	case PUT:
 	case DELETE:
 		return nil, fmt.Errorf("%s is not supported", method)
@@ -46,14 +49,39 @@ func ToHttpMethod(input string) (*HttpMethod, error) {
 	return nil, fmt.Errorf("unknown method: %s", method)
 }
 
+type URL string
+
+type HttpRequestDetails interface {
+	Method() HttpMethod
+	URL() URL
+	Body() io.Reader
+	Headers() HttpHeaders
+}
+
+func BuildRequest(details HttpRequestDetails) (*http.Request, error) {
+	req, err := http.NewRequest(string(details.Method()), string(details.URL()), details.Body())
+	if err != nil {
+		return nil, err
+	}
+	headers := details.Headers()
+	for name, values := range headers {
+		for _, v := range values {
+			req.Header.Add(name, v)
+		}
+	}
+	return req, nil
+}
+
+type HttpHeader struct {
+	Name  string
+	Value string
+}
+
 type HttpHeaders map[string][]string
 
 type Queries map[string][]string
 
-type HttpTestRequest interface {
-	Method() HttpMethod
-	URL() string
-}
+type HttpTestRequest HttpRequestDetails
 
 type TestResult interface {
 	IsSuccess() bool
@@ -78,7 +106,7 @@ func (hm *HttpMon) httpClient() HttpClient {
 
 func (hm *HttpMon) Run(request HttpTestRequest) (HttpTest, error) {
 	client := hm.httpClient()
-	response, err := client.Run(request.Method(), request.URL())
+	response, err := client.Run(request)
 	if err != nil {
 		return nil, err
 	}

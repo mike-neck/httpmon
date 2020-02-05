@@ -2,8 +2,8 @@ package httpmon
 
 import "fmt"
 
-// RunTestCase runs http access test against given url, inspecting its response.
-func RunTestCase(method, URL, timout string, status int) ([]TestResult, error) {
+// RunGetRequestCase runs http access test against given url, inspecting its response.
+func RunGetRequestCase(method, URL, timout string, status int) ([]TestResult, error) {
 	caseRunner, err := NewCaseRunner(method, URL, timout)
 	if err != nil {
 		return nil, err
@@ -24,11 +24,11 @@ type CaseRunner interface {
 
 type defaultCaseRunner struct {
 	HttpMon
-	HttpTestRequest
+	HttpRequestDetails
 }
 
 func (c *defaultCaseRunner) Run() (HttpTest, error) {
-	httpTest, err := c.HttpMon.Run(c.HttpTestRequest)
+	httpTest, err := c.HttpMon.Run(c.HttpRequestDetails)
 	if err != nil {
 		return nil, &HttpCommunicationError{
 			CaseError{
@@ -80,7 +80,7 @@ func NewCaseRunner(method, URL, timout string) (CaseRunner, error) {
 			},
 		}
 	}
-	request, err := NewRequest(*httpMethod, URL)
+	requestDetails, err := NewGetRequestDetails(*httpMethod, URL)
 	if err != nil {
 		return nil, &UserInputError{
 			CaseError{
@@ -90,7 +90,7 @@ func NewCaseRunner(method, URL, timout string) (CaseRunner, error) {
 		}
 	}
 	return &defaultCaseRunner{
-		HttpMon:         *httpMon,
-		HttpTestRequest: request,
+		HttpMon:            *httpMon,
+		HttpRequestDetails: requestDetails,
 	}, nil
 }
