@@ -1,6 +1,9 @@
 name: test
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - 'cmd/**/*'
 
 jobs:
   run-tests:
@@ -20,4 +23,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Run Tests
-        run: make check
+        run: make test
