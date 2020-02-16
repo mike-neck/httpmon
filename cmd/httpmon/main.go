@@ -101,7 +101,7 @@ func testCaseAction(method, timeout *string, status *int) cli.ActionFunc {
 			}
 		}
 		url := ctx.Args().First()
-		results, err := httpmon.RunTestCase(*method, url, *timeout, *status)
+		results, err := httpmon.RunGetRequestCase(*method, url, *timeout, *status)
 		if err != nil {
 			return err
 		}

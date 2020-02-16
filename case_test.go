@@ -9,14 +9,14 @@ import (
 )
 
 func TestRunTestCase_InvalidInput(t *testing.T) {
-	results, err := RunTestCase("HEAD", "https://examaple.com", "5s", 404)
+	results, err := RunGetRequestCase("HEAD", "https://examaple.com", "5s", 404)
 	assert.NotNil(t, err)
 	assert.IsType(t, new(UserInputError), err)
 	assert.Nil(t, results)
 }
 
 func TestRunTestCase_HttpCommunicationError(t *testing.T) {
-	results, err := RunTestCase("GET", "http://localhost:4000/test", "2s", 200)
+	results, err := RunGetRequestCase("GET", "http://localhost:4000/test", "2s", 200)
 	assert.NotNil(t, err)
 	assert.IsType(t, new(HttpCommunicationError), err)
 	assert.Nil(t, results)
@@ -29,7 +29,7 @@ func TestRunTestCase(t *testing.T) {
 	}))
 	defer func() { _ = server.Close }()
 
-	results, err := RunTestCase("GET", server.URL, "2s", 200)
+	results, err := RunGetRequestCase("GET", server.URL, "2s", 200)
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(results))
 	assert.True(t, results[0].IsSuccess())

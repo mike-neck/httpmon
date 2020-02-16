@@ -1,6 +1,9 @@
 name: test
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - 'cmd/**/*'
 
 jobs:
   run-tests:
@@ -19,10 +22,5 @@ jobs:
           go-version: 1.13
       - name: Checkout
         uses: actions/checkout@v2
-#      - name: Lint
-#        run: |
-#          GO111MODULE=off GOBIN=$(pwd)/bin go get golang.org/x/lint/golint
-#          bin/golint -set_exit_status ./...
-#        if: "matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'"
       - name: Run Tests
-        run: make check
+        run: make test

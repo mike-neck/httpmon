@@ -25,6 +25,17 @@ test-cli:
 test:
 	go test ./...
 
+.PHONY: tidy-root
+tidy-root:
+	go mod tidy
+
+.PHONY: tidy-cli
+tidy-cli:
+	cd cmd/httpmon && go mod tidy
+
+.PHONY: tidy
+tidy: tidy-root tidy-cli
+
 .PHONY: clean
 clean:
 	go clean
