@@ -10,6 +10,10 @@ build-cli-win:
 build-cli-linux:
 	cd cmd/httpmon && GOOS=linux GOARCH=amd64 go build -o ../../build/linux/http-mon ./...
 
+.PHONY: mkdir-build
+mkdir-build:
+	if [ ! -d build ]; then mkdir build; fi
+
 .PHONY: build
 build: build-cli-linux build-cli-mac build-cli-win
 	mkdir build/release
@@ -22,8 +26,9 @@ test-cli:
 	cd cmd/httpmon && go test ./...
 
 .PHONY: test
-test:
-	go test ./...
+test: mkdir-build
+	go test -coverprofile=build/v1-report.txt ./...
+	go tool cover -html=build/v1-report.txt -o build/v1-report.html
 
 .PHONY: clean
 clean:
