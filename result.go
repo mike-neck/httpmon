@@ -55,3 +55,17 @@ func (fail *HttpStatusFailure) String() string {
 actual  : %s`
 	return fmt.Sprintf(template, fail.Expected(), fail.Actual())
 }
+
+func newHttpStatusTestResult(userExpected, actualResponse HttpResponseStatus) TestResult {
+	if userExpected == actualResponse {
+		return &HttpStatusSuccess{
+			UserExpected: userExpected,
+			Response:     actualResponse,
+		}
+	} else {
+		return &HttpStatusFailure{
+			UserExpected: userExpected,
+			Response:     actualResponse,
+		}
+	}
+}
