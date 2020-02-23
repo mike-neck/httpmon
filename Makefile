@@ -8,8 +8,8 @@ test-cli:
 
 .PHONY: test
 test: mkdir-build
-	go test -coverprofile=build/v1-report.txt ./...
-	go tool cover -html=build/v1-report.txt -o build/v1-report.html
+	go test -coverprofile=build/test-report.txt
+	go tool cover -html=build/test-report.txt -o build/test-report.html
 
 .PHONY: clean
 clean:

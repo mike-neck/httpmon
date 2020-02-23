@@ -37,7 +37,7 @@ func createApplication(actionFactory ActionFactory) *cli.App {
 				Aliases:     []string{"X"},
 				Usage:       "http method",
 				Required:    false,
-				Value:       "GET",
+				Value:       "GetMethod",
 				Destination: &method,
 			},
 			&cli.StringFlag{
