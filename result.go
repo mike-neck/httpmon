@@ -9,6 +9,14 @@ type HttpStatusSuccess struct {
 	Response     HttpResponseStatus
 }
 
+func (suc *HttpStatusSuccess) Success() bool {
+	return true
+}
+
+func (suc *HttpStatusSuccess) Comparison() Comparison {
+	return suc
+}
+
 func (suc *HttpStatusSuccess) Expected() string {
 	return fmt.Sprintf("status = %d", suc.UserExpected)
 }
@@ -24,6 +32,14 @@ func (suc *HttpStatusSuccess) String() string {
 type HttpStatusFailure struct {
 	UserExpected HttpResponseStatus
 	Response     HttpResponseStatus
+}
+
+func (fail *HttpStatusFailure) Success() bool {
+	return false
+}
+
+func (fail *HttpStatusFailure) Comparison() Comparison {
+	return fail
 }
 
 func (fail *HttpStatusFailure) Expected() string {
