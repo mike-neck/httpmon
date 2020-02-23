@@ -25,4 +25,4 @@ jobs:
 #          bin/golint -set_exit_status ./...
 #        if: "matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'"
       - name: Run Tests
-        run: make check
+        run: make test
