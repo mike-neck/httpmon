@@ -1,0 +1,33 @@
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: main.go
+    dir: cmd/httpmon
+    binary: httpmon
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+archives:
+  - replacements:
+      darwin: macOS
+      linux: Linux
+      windows: Windows
+      amd64: x86_64
+    name_template: "httpmon_{{.Version}}_{{.Os}}_{{.Arch}}"
+    format: zip
+    format_overrides:
+      - goos: linux
+        format: tar.gz
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-snapshot"
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
