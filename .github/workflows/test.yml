@@ -23,9 +23,13 @@ jobs:
 
       - name: Install gomock
         run:  GO111MODULE=on go get github.com/golang/mock/mockgen@latest
+        env:
+          GOPATH: ${{ runner.temp }}/go
 
       - name: Run Tests
         run: make test
+        env:
+          GOPATH: ${{ runner.temp }}/go
 
       - name: Store report
         uses: actions/upload-artifact@v1

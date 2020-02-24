@@ -4,7 +4,7 @@ mkdir-build:
 
 .PHONY: test-gen
 test-gen:
-	mockgen -source=client.go -package=httpmon -destination=./client_mock.go
+	${GOPATH}/bin/mockgen -source=client.go -package=httpmon -destination=./client_mock.go
 
 .PHONY: test-cli
 test-cli:
