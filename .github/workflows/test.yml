@@ -21,6 +21,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Install gomock
+        run:  GO111MODULE=on go get github.com/golang/mock/mockgen@latest
+
       - name: Run Tests
         run: make test
 
