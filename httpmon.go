@@ -108,6 +108,7 @@ type HttpClient interface {
 
 type HttpResponseStatus int
 
+type Timeout time.Duration
 type ResponseTime time.Duration
 
 type HttpTest interface {
