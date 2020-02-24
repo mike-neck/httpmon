@@ -38,3 +38,48 @@ actual  : status = 401`, failure.String())
 	assert.False(t, result.Success())
 	assert.Equal(t, failure, result.Comparison())
 }
+
+func Test_SoftHeaderTest_Success(t *testing.T) {
+	var comparison Comparison
+	comparison = &SoftHeaderTest{
+		Name: HttpHeaderName("Content-Type"),
+		ActualValues: HttpHeaderValues{
+			"application/json",
+			"application/vnd.v2.example.com+json",
+		},
+		ExpectedHeaderValue: HttpHeaderValue("application/json"),
+	}
+
+	assert.Equal(t, "values = ['application/json','application/vnd.v2.example.com+json']", comparison.Actual())
+	assert.Equal(t, "value = 'application/json'", comparison.Expected())
+	assert.Equal(t, "ok", comparison.String())
+}
+
+func Test_SoftHeaderTest_Failure(t *testing.T) {
+	var comparison Comparison
+	comparison = &SoftHeaderTest{
+		Name: HttpHeaderName("Content-Type"),
+		ActualValues: HttpHeaderValues{
+			"application/xml",
+		},
+		ExpectedHeaderValue: HttpHeaderValue("application/json"),
+	}
+
+	assert.Equal(t, "values = ['application/xml']", comparison.Actual())
+	assert.Equal(t, "value = 'application/json'", comparison.Expected())
+	assert.Equal(t, `expected: value = 'application/json'
+actual  : values = ['application/xml']`, comparison.String())
+}
+
+func Test_SoftHeaderTest_NotFound(t *testing.T) {
+	var comparison Comparison
+	comparison = &SoftHeaderTest{
+		Name:                HttpHeaderName("Content-Type"),
+		ExpectedHeaderValue: HttpHeaderValue("application/json"),
+	}
+
+	assert.Equal(t, "header not found", comparison.Actual())
+	assert.Equal(t, "value = 'application/json'", comparison.Expected())
+	assert.Equal(t, `expected: value = 'application/json'
+actual  : header not found`, comparison.String())
+}

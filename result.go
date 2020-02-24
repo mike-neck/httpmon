@@ -1,6 +1,9 @@
 package httpmon
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // implementations of Comparison
 
@@ -51,10 +54,17 @@ func (fail *HttpStatusFailure) Actual() string {
 }
 
 func (fail *HttpStatusFailure) String() string {
-	template := `expected: %s
-actual  : %s`
-	return fmt.Sprintf(template, fail.Expected(), fail.Actual())
+	expected := fail.Expected()
+	actual := fail.Actual()
+	return comparisonFailureString(expected, actual)
 }
+
+func comparisonFailureString(expected, actual string) string {
+	return fmt.Sprintf(comparisonFailureTemplate, expected, actual)
+}
+
+var comparisonFailureTemplate string = `expected: %s
+actual  : %s`
 
 func newHttpStatusTestResult(userExpected, actualResponse HttpResponseStatus) TestResult {
 	if userExpected == actualResponse {
@@ -68,4 +78,52 @@ func newHttpStatusTestResult(userExpected, actualResponse HttpResponseStatus) Te
 			Response:     actualResponse,
 		}
 	}
+}
+
+type SoftHeaderTest struct {
+	Name                HttpHeaderName
+	ActualValues        HttpHeaderValues
+	ExpectedHeaderValue HttpHeaderValue
+}
+
+func (h *SoftHeaderTest) Success() bool {
+	return h.isSuccess()
+}
+
+func (h *SoftHeaderTest) Comparison() Comparison {
+	return h
+}
+
+func (h *SoftHeaderTest) isSuccess() bool {
+	exp := h.ExpectedHeaderValue
+	for _, v := range h.ActualValues {
+		if v == exp {
+			return true
+		}
+	}
+	return false
+}
+
+func (h *SoftHeaderTest) String() string {
+	if h.isSuccess() {
+		return "ok"
+	} else {
+		return comparisonFailureString(h.Expected(), h.Actual())
+	}
+}
+
+func (h *SoftHeaderTest) Expected() string {
+	return fmt.Sprintf("value = '%s'", h.ExpectedHeaderValue)
+}
+
+func (h *SoftHeaderTest) Actual() string {
+	if len(h.ActualValues) == 0 {
+		return "header not found"
+	}
+	values := make([]string, len(h.ActualValues))
+	for i, v := range h.ActualValues {
+		values[i] = fmt.Sprintf("'%s'", string(v))
+	}
+	str := strings.Join(values, ",")
+	return fmt.Sprintf("values = [%s]", str)
 }
