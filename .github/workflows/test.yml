@@ -25,7 +25,7 @@ jobs:
         run: make test
 
       - name: Store report
-        uses: actions/uploard-artifact@v1
+        uses: actions/upload-artifact@v1
         if: always()
         with:
           name: test-report
