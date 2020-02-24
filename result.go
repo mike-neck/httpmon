@@ -113,17 +113,17 @@ func (h *SoftHeaderTest) String() string {
 }
 
 func (h *SoftHeaderTest) Expected() string {
-	return fmt.Sprintf("value = '%s'", h.ExpectedHeaderValue)
+	return fmt.Sprintf("header[%s] value = '%s'", h.Name, h.ExpectedHeaderValue)
 }
 
 func (h *SoftHeaderTest) Actual() string {
 	if len(h.ActualValues) == 0 {
-		return "header not found"
+		return fmt.Sprintf("header[%s] not found", h.Name)
 	}
 	values := make([]string, len(h.ActualValues))
 	for i, v := range h.ActualValues {
 		values[i] = fmt.Sprintf("'%s'", string(v))
 	}
 	str := strings.Join(values, ",")
-	return fmt.Sprintf("values = [%s]", str)
+	return fmt.Sprintf("header[%s] values = [%s]", h.Name, str)
 }

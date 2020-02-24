@@ -10,6 +10,14 @@ type DefaultHttpTest struct {
 	Header http.Header
 }
 
+func (dht *DefaultHttpTest) Performance() ResponseTime {
+	panic("implement me")
+}
+
+func (dht *DefaultHttpTest) ExpectResponseTimeWithin(responseTime ResponseTime) TestResult {
+	panic("implement me")
+}
+
 func (dht *DefaultHttpTest) ExpectStatus(status HttpResponseStatus) TestResult {
 	return newHttpStatusTestResult(status, dht.Status)
 }

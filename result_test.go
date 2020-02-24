@@ -50,8 +50,8 @@ func Test_SoftHeaderTest_Success(t *testing.T) {
 		ExpectedHeaderValue: HttpHeaderValue("application/json"),
 	}
 
-	assert.Equal(t, "values = ['application/json','application/vnd.v2.example.com+json']", comparison.Actual())
-	assert.Equal(t, "value = 'application/json'", comparison.Expected())
+	assert.Equal(t, "header[Content-Type] values = ['application/json','application/vnd.v2.example.com+json']", comparison.Actual())
+	assert.Equal(t, "header[Content-Type] value = 'application/json'", comparison.Expected())
 	assert.Equal(t, "ok", comparison.String())
 }
 
@@ -65,10 +65,10 @@ func Test_SoftHeaderTest_Failure(t *testing.T) {
 		ExpectedHeaderValue: HttpHeaderValue("application/json"),
 	}
 
-	assert.Equal(t, "values = ['application/xml']", comparison.Actual())
-	assert.Equal(t, "value = 'application/json'", comparison.Expected())
-	assert.Equal(t, `expected: value = 'application/json'
-actual  : values = ['application/xml']`, comparison.String())
+	assert.Equal(t, "header[Content-Type] values = ['application/xml']", comparison.Actual())
+	assert.Equal(t, "header[Content-Type] value = 'application/json'", comparison.Expected())
+	assert.Equal(t, `expected: header[Content-Type] value = 'application/json'
+actual  : header[Content-Type] values = ['application/xml']`, comparison.String())
 }
 
 func Test_SoftHeaderTest_NotFound(t *testing.T) {
@@ -78,8 +78,8 @@ func Test_SoftHeaderTest_NotFound(t *testing.T) {
 		ExpectedHeaderValue: HttpHeaderValue("application/json"),
 	}
 
-	assert.Equal(t, "header not found", comparison.Actual())
-	assert.Equal(t, "value = 'application/json'", comparison.Expected())
-	assert.Equal(t, `expected: value = 'application/json'
-actual  : header not found`, comparison.String())
+	assert.Equal(t, "header[Content-Type] not found", comparison.Actual())
+	assert.Equal(t, "header[Content-Type] value = 'application/json'", comparison.Expected())
+	assert.Equal(t, `expected: header[Content-Type] value = 'application/json'
+actual  : header[Content-Type] not found`, comparison.String())
 }

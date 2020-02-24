@@ -111,8 +111,9 @@ type HttpResponseStatus int
 type ResponseTime time.Duration
 
 type HttpTest interface {
+	Performance() ResponseTime
 	ExpectStatus(status HttpResponseStatus) TestResult
-	ExpectTime(responseTime ResponseTime) TestResult
+	ExpectResponseTimeWithin(responseTime ResponseTime) TestResult
 	ExpectHeader(name HttpHeaderName, value HttpHeaderValue) TestResult
 	ExpectBodyContainsString(part string) TestResult
 	ExpectBodyMatches(pattern string) TestResult

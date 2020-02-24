@@ -46,5 +46,5 @@ func TestHttpTest_ExpectHeader_NotFound(t *testing.T) {
 	assert.NotNil(t, result)
 	assert.False(t, result.Success())
 	comparison := result.Comparison()
-	assert.Equal(t, "header not found", comparison.Actual())
+	assert.Equal(t, "header[content-type] not found", comparison.Actual())
 }
