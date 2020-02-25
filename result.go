@@ -2,7 +2,9 @@ package httpmon
 
 import (
 	"fmt"
+	"github.com/hako/durafmt"
 	"strings"
+	"time"
 )
 
 // implementations of Comparison
@@ -80,6 +82,8 @@ func newHttpStatusTestResult(userExpected, actualResponse HttpResponseStatus) Te
 	}
 }
 
+////////
+
 type SoftHeaderTest struct {
 	Name                HttpHeaderName
 	ActualValues        HttpHeaderValues
@@ -126,4 +130,34 @@ func (h *SoftHeaderTest) Actual() string {
 	}
 	str := strings.Join(values, ",")
 	return fmt.Sprintf("header[%s] values = [%s]", h.Name, str)
+}
+
+////////
+
+// ResponseTimeComparison
+
+type ResponseTimeTest struct {
+	ActualTime ResponseTime
+	ExpectTime ResponseTime
+}
+
+func (res *ResponseTimeTest) isSuccess() bool {
+	return res.ActualTime <= res.ExpectTime
+}
+
+func (res *ResponseTimeTest) String() string {
+	if res.isSuccess() {
+		return "ok"
+	}
+	return comparisonFailureString(res.Expected(), res.Actual())
+}
+
+func (res *ResponseTimeTest) Expected() string {
+	dt := durafmt.Parse(time.Duration(res.ExpectTime))
+	return fmt.Sprintf("response = %s", dt.String())
+}
+
+func (res *ResponseTimeTest) Actual() string {
+	dt := durafmt.Parse(time.Duration(res.ActualTime))
+	return fmt.Sprintf("response = %s", dt.String())
 }

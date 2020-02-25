@@ -3,6 +3,7 @@ package httpmon
 import (
 	"github.com/stretchr/testify/assert"
 	"testing"
+	"time"
 )
 
 func Test_HttpStatus_Success(t *testing.T) {
@@ -82,4 +83,16 @@ func Test_SoftHeaderTest_NotFound(t *testing.T) {
 	assert.Equal(t, "header[Content-Type] value = 'application/json'", comparison.Expected())
 	assert.Equal(t, `expected: header[Content-Type] value = 'application/json'
 actual  : header[Content-Type] not found`, comparison.String())
+}
+
+func TestResponseTimeTest_Success(t *testing.T) {
+	var comparison Comparison
+	comparison = &ResponseTimeTest{
+		ActualTime: ResponseTime(3280 * time.Millisecond),
+		ExpectTime: ResponseTime(5 * time.Second),
+	}
+
+	assert.Equal(t, "response = 3 seconds 280 milliseconds", comparison.Actual())
+	assert.Equal(t, "response = 5 seconds", comparison.Expected())
+	assert.Equal(t, "ok", comparison.String())
 }
