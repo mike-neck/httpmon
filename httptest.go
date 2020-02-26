@@ -8,14 +8,18 @@ import (
 type DefaultHttpTest struct {
 	Status HttpResponseStatus
 	Header http.Header
+	ResponseTime
 }
 
 func (dht *DefaultHttpTest) Performance() ResponseTime {
-	panic("implement me")
+	return dht.ResponseTime
 }
 
 func (dht *DefaultHttpTest) ExpectResponseTimeWithin(responseTime ResponseTime) TestResult {
-	panic("implement me")
+	return &ResponseTimeTest{
+		ActualTime: dht.ResponseTime,
+		ExpectTime: responseTime,
+	}
 }
 
 func (dht *DefaultHttpTest) ExpectStatus(status HttpResponseStatus) TestResult {

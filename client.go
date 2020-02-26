@@ -24,14 +24,19 @@ func (client *DefaultHttpClient) Run(request HttpRequest) (HttpTest, error) {
 		return nil, err
 	}
 
+	start := time.Now()
 	response, err := client.GoHttpClient.Run(req)
 	if err != nil {
 		return nil, err
 	}
+	finish := time.Now()
+
+	duration := finish.Sub(start)
 
 	return &DefaultHttpTest{
-		Status: HttpResponseStatus(response.StatusCode),
-		Header: response.Header,
+		Status:       HttpResponseStatus(response.StatusCode),
+		Header:       response.Header,
+		ResponseTime: ResponseTime(duration),
 	}, nil
 }
 

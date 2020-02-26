@@ -96,3 +96,16 @@ func TestResponseTimeTest_Success(t *testing.T) {
 	assert.Equal(t, "response = 5 seconds", comparison.Expected())
 	assert.Equal(t, "ok", comparison.String())
 }
+
+func TestResponseTimeTest_Failure(t *testing.T) {
+	var comparison Comparison
+	comparison = &ResponseTimeTest{
+		ActualTime: ResponseTime(5001 * time.Millisecond),
+		ExpectTime: ResponseTime(5 * time.Second),
+	}
+
+	assert.Equal(t, "response = 5 seconds 1 millisecond", comparison.Actual())
+	assert.Equal(t, "response = 5 seconds", comparison.Expected())
+	assert.NotEqual(t, "ok", comparison.String())
+	assert.Contains(t, comparison.String(), "actual  : response = 5 seconds 1 millisecond")
+}

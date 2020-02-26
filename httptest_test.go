@@ -10,8 +10,9 @@ func TestHttpTest_ExpectStatus_Success(t *testing.T) {
 	headers := make(http.Header, 0)
 	headers.Add("content-type", "application/json; charset=utf-8")
 	var test HttpTest = &DefaultHttpTest{
-		Status: HttpResponseStatus(200),
-		Header: headers,
+		Status:       HttpResponseStatus(200),
+		Header:       headers,
+		ResponseTime: 1000,
 	}
 
 	result := test.ExpectStatus(200)
@@ -22,6 +23,15 @@ func TestHttpTest_ExpectStatus_Success(t *testing.T) {
 	result = test.ExpectHeader("Content-Type", "application/json; charset=utf-8")
 	assert.NotNil(t, result)
 	assert.True(t, result.Success())
+
+	assert.Equal(t, ResponseTime(1000), test.Performance())
+
+	within := test.ExpectResponseTimeWithin(1001)
+	if within == nil {
+		assert.Fail(t, "unexpected nil of test")
+		return
+	}
+	assert.True(t, within.Success())
 }
 
 func TestHttpTest_ExpectStatus_Failure(t *testing.T) {

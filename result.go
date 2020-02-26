@@ -141,6 +141,14 @@ type ResponseTimeTest struct {
 	ExpectTime ResponseTime
 }
 
+func (res *ResponseTimeTest) Success() bool {
+	return res.isSuccess()
+}
+
+func (res *ResponseTimeTest) Comparison() Comparison {
+	return res
+}
+
 func (res *ResponseTimeTest) isSuccess() bool {
 	return res.ActualTime <= res.ExpectTime
 }
