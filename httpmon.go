@@ -108,6 +108,10 @@ type HttpClient interface {
 
 type HttpResponseStatus int
 
+func (s HttpResponseStatus) IsValidValue() bool {
+	return 100 <= s && s < 600
+}
+
 type Timeout time.Duration
 type ResponseTime time.Duration
 

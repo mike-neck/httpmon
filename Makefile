@@ -5,6 +5,8 @@ mkdir-build:
 .PHONY: test-gen
 test-gen:
 	${GOPATH}/bin/mockgen -source=client.go -package=httpmon -destination=./client_mock.go
+	${GOPATH}/bin/mockgen -source=use_case.go -package=httpmon -destination=./use_case_mock.go
+	${GOPATH}/bin/mockgen -source=httpmon.go -package=httpmon -destination=./httpmon_mock.go
 
 .PHONY: test-cli
 test-cli:

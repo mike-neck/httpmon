@@ -3,4 +3,4 @@ build/
 
 dist/
 
-client_mock.go
+*_mock.go
