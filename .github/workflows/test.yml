@@ -32,6 +32,11 @@ jobs:
         env:
           GOPATH: ${{ runner.temp }}/go
 
+      - name: Generate coverage
+        run: make coverage
+        env:
+          GOPATH: ${{ runner.temp }}/go
+
       - name: Store report
         uses: actions/upload-artifact@v1
         if: always()

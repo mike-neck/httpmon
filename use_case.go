@@ -68,6 +68,10 @@ func (getCase *GetCase) Run() (CaseResult, error) {
 		status := test.ExpectStatus(getCase.ExpectStatus)
 		result.Append(status)
 	}
+	for _, hdr := range getCase.ExpectedHeaders {
+		headerResult := test.ExpectHeader(hdr.Name, hdr.Value)
+		result.Append(headerResult)
+	}
 	return result, nil
 }
 

@@ -66,13 +66,22 @@ func TestGetCase_NewRequest_WithHeader(t *testing.T) {
 	}, request.requestHeader())
 }
 
-func TestGetCase_Run(t *testing.T) {
+func TestGetCase_Run_Success(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	test := NewMockHttpTest(ctrl)
 	test.EXPECT().ExpectStatus(gomock.Eq(HttpResponseStatus(200))).Return(&HttpStatusSuccess{
 		UserExpected: 200,
 		Response:     200,
 	})
+	test.EXPECT().
+		ExpectHeader(HttpHeaderName("content-type"), HttpHeaderValue("application/json")).
+		Return(&SoftHeaderTest{
+			Name: "content-type",
+			ActualValues: HttpHeaderValues{
+				"application/json",
+			},
+			ExpectedHeaderValue: "application/json",
+		})
 
 	httpClient := NewMockHttpClient(ctrl)
 	httpClient.EXPECT().
@@ -83,11 +92,16 @@ func TestGetCase_Run(t *testing.T) {
 		newClient().Return(httpClient)
 
 	getCase := GetCase{
-		ClientBuilder:   builder,
-		URL:             "https://example.com",
-		RequestHeaders:  []RequestHeader{},
-		ExpectStatus:    200,
-		ExpectedHeaders: []ExpectedHeader{},
+		ClientBuilder:  builder,
+		URL:            "https://example.com",
+		RequestHeaders: []RequestHeader{},
+		ExpectStatus:   200,
+		ExpectedHeaders: []ExpectedHeader{
+			{
+				Name:  "content-type",
+				Value: "application/json",
+			},
+		},
 	}
 
 	caseResult, err := getCase.Run()
@@ -98,7 +112,7 @@ func TestGetCase_Run(t *testing.T) {
 
 	assert.True(t, caseResult.Success)
 	assert.Len(t, caseResult.Failed, 0)
-	assert.Equal(t, 1, caseResult.TestCount)
+	assert.Equal(t, 2, caseResult.TestCount)
 }
 
 func TestGetCase_Run_Error(t *testing.T) {
