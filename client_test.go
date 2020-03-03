@@ -30,7 +30,7 @@ func TestHttpClient(t *testing.T) {
 	defer server.Close()
 
 	var client HttpClient
-	client = NewHttpClient(1000000)
+	client = NewHttpClient(Timeout(700 * time.Millisecond))
 	assert.NotNil(t, client)
 
 	request := GET(HttpRequestURL(server.URL))
