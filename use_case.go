@@ -1,9 +1,5 @@
 package httpmon
 
-type Case interface {
-	Run() (CaseResult, error)
-}
-
 type CaseResult struct {
 	Success   bool
 	Failed    []Comparison
@@ -48,36 +44,37 @@ type ExpectedHeader struct {
 	Value HttpHeaderValue
 }
 
-type GetCase struct {
+type Case struct {
 	ClientBuilder
+	HttpRequestMethod
 	URL             HttpRequestURL
 	RequestHeaders  []RequestHeader
 	ExpectStatus    HttpResponseStatus
 	ExpectedHeaders []ExpectedHeader
 }
 
-func (getCase *GetCase) Run() (CaseResult, error) {
-	client := getCase.newClient()
-	request := getCase.newRequest()
+func (c *Case) Run() (CaseResult, error) {
+	client := c.newClient()
+	request := c.newRequest()
 	test, err := client.Run(request)
 	if err != nil {
 		return CaseResult{}, err
 	}
 	result := newEmptyCaseResult()
-	if getCase.ExpectStatus.IsValidValue() {
-		status := test.ExpectStatus(getCase.ExpectStatus)
+	if c.ExpectStatus.IsValidValue() {
+		status := test.ExpectStatus(c.ExpectStatus)
 		result.Append(status)
 	}
-	for _, hdr := range getCase.ExpectedHeaders {
+	for _, hdr := range c.ExpectedHeaders {
 		headerResult := test.ExpectHeader(hdr.Name, hdr.Value)
 		result.Append(headerResult)
 	}
 	return result, nil
 }
 
-func (getCase *GetCase) newRequest() HttpRequest {
-	request := GET(getCase.URL)
-	for _, h := range getCase.RequestHeaders {
+func (c *Case) newRequest() HttpRequest {
+	request := c.HttpRequestMethod(c.URL)
+	for _, h := range c.RequestHeaders {
 		request.AddHeader(h.Name, h.Value)
 	}
 	return request

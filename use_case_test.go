@@ -18,15 +18,16 @@ func TestConfigNewClient(t *testing.T) {
 
 func TestGetCase_NewRequest_WithoutHeader(t *testing.T) {
 	config := &Config{RequestTimeout: Timeout(3 * time.Second)}
-	getCase := GetCase{
-		ClientBuilder:   config,
-		URL:             "https://example.com/test",
-		RequestHeaders:  []RequestHeader{},
-		ExpectStatus:    200,
-		ExpectedHeaders: []ExpectedHeader{},
+	c := Case{
+		ClientBuilder:     config,
+		HttpRequestMethod: GET,
+		URL:               "https://example.com/test",
+		RequestHeaders:    []RequestHeader{},
+		ExpectStatus:      200,
+		ExpectedHeaders:   []ExpectedHeader{},
 	}
 
-	request := getCase.newRequest()
+	request := c.newRequest()
 
 	assert.Equal(t, GetMethod, request.requestMethod())
 	assert.Equal(t, HttpRequestURL("https://example.com/test"), request.requestURL())
@@ -35,9 +36,10 @@ func TestGetCase_NewRequest_WithoutHeader(t *testing.T) {
 
 func TestGetCase_NewRequest_WithHeader(t *testing.T) {
 	config := &Config{RequestTimeout: Timeout(3 * time.Second)}
-	getCase := GetCase{
-		ClientBuilder: config,
-		URL:           "https://example.com/test",
+	getCase := Case{
+		ClientBuilder:     config,
+		HttpRequestMethod: GET,
+		URL:               "https://example.com/test",
 		RequestHeaders: []RequestHeader{
 			{
 				Name:  "Accept",
@@ -91,11 +93,12 @@ func TestGetCase_Run_Success(t *testing.T) {
 	builder.EXPECT().
 		newClient().Return(httpClient)
 
-	getCase := GetCase{
-		ClientBuilder:  builder,
-		URL:            "https://example.com",
-		RequestHeaders: []RequestHeader{},
-		ExpectStatus:   200,
+	getCase := Case{
+		ClientBuilder:     builder,
+		HttpRequestMethod: GET,
+		URL:               "https://example.com",
+		RequestHeaders:    []RequestHeader{},
+		ExpectStatus:      200,
 		ExpectedHeaders: []ExpectedHeader{
 			{
 				Name:  "content-type",
@@ -126,12 +129,13 @@ func TestGetCase_Run_Error(t *testing.T) {
 	builder.EXPECT().
 		newClient().Return(httpClient)
 
-	getCase := GetCase{
-		ClientBuilder:   builder,
-		URL:             "https://example.com",
-		RequestHeaders:  []RequestHeader{},
-		ExpectStatus:    200,
-		ExpectedHeaders: []ExpectedHeader{},
+	getCase := Case{
+		ClientBuilder:     builder,
+		HttpRequestMethod: GET,
+		URL:               "https://example.com",
+		RequestHeaders:    []RequestHeader{},
+		ExpectStatus:      200,
+		ExpectedHeaders:   []ExpectedHeader{},
 	}
 
 	caseResult, err := getCase.Run()
