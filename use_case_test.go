@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
+	"net/http"
 	"testing"
 	"time"
 )
@@ -148,4 +149,44 @@ func TestGetCase_Run_Error(t *testing.T) {
 	assert.Equal(t, 0, caseResult.TestCount)
 	assert.Len(t, caseResult.Failed, 0)
 	assert.False(t, caseResult.Success)
+}
+
+func TestCase_Run_Failure(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	httpClient := NewMockHttpClient(ctrl)
+	httpClient.EXPECT().
+		Run(gomock.Any()).Return(&DefaultHttpTest{
+		Status: 404,
+		Header: http.Header{
+			"content-type": []string{"application/json"},
+		},
+		ResponseTime: ResponseTime(3 * time.Second),
+	}, nil)
+	builder := NewMockClientBuilder(ctrl)
+	builder.EXPECT().
+		newClient().Return(httpClient)
+
+	getCase := Case{
+		ClientBuilder:     builder,
+		HttpRequestMethod: GET,
+		URL:               "https://example.com",
+		RequestHeaders:    []RequestHeader{},
+		ExpectStatus:      200,
+		ExpectedHeaders: []ExpectedHeader{
+			{
+				Name:  "Content-Type",
+				Value: "application/xml",
+			},
+		},
+	}
+
+	result, err := getCase.Run()
+
+	if err != nil {
+		assert.Fail(t, "unexpected err: %v", err)
+		return
+	}
+	assert.False(t, result.Success)
+	assert.Len(t, result.Failed, 2)
 }
