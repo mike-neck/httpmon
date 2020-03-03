@@ -44,6 +44,14 @@ type ExpectedHeader struct {
 	Value HttpHeaderValue
 }
 
+type ExpectedResponseTime func() ResponseTime
+
+func ExpectedResponseTimeOf(t ResponseTime) ExpectedResponseTime {
+	return func() ResponseTime {
+		return t
+	}
+}
+
 type Case struct {
 	ClientBuilder
 	HttpRequestMethod
@@ -51,6 +59,7 @@ type Case struct {
 	RequestHeaders  []RequestHeader
 	ExpectStatus    HttpResponseStatus
 	ExpectedHeaders []ExpectedHeader
+	ExpectedResponseTime
 }
 
 func (c *Case) Run() (CaseResult, error) {
@@ -68,6 +77,10 @@ func (c *Case) Run() (CaseResult, error) {
 	for _, hdr := range c.ExpectedHeaders {
 		headerResult := test.ExpectHeader(hdr.Name, hdr.Value)
 		result.Append(headerResult)
+	}
+	if c.ExpectedResponseTime != nil {
+		timeResult := test.ExpectResponseTimeWithin(c.ExpectedResponseTime())
+		result.Append(timeResult)
 	}
 	return result, nil
 }

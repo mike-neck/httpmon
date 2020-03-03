@@ -85,6 +85,14 @@ func TestGetCase_Run_Success(t *testing.T) {
 			},
 			ExpectedHeaderValue: "application/json",
 		})
+	test.EXPECT().
+		ExpectResponseTimeWithin(gomock.Any()).
+		DoAndReturn(func(rt ResponseTime) TestResult {
+			return &ResponseTimeTest{
+				ActualTime: ResponseTime(2100 * time.Millisecond),
+				ExpectTime: rt,
+			}
+		})
 
 	httpClient := NewMockHttpClient(ctrl)
 	httpClient.EXPECT().
@@ -106,6 +114,7 @@ func TestGetCase_Run_Success(t *testing.T) {
 				Value: "application/json",
 			},
 		},
+		ExpectedResponseTime: ExpectedResponseTimeOf(ResponseTime(3 * time.Second)),
 	}
 
 	caseResult, err := getCase.Run()
@@ -116,7 +125,7 @@ func TestGetCase_Run_Success(t *testing.T) {
 
 	assert.True(t, caseResult.Success)
 	assert.Len(t, caseResult.Failed, 0)
-	assert.Equal(t, 2, caseResult.TestCount)
+	assert.Equal(t, 3, caseResult.TestCount)
 }
 
 func TestGetCase_Run_Error(t *testing.T) {
@@ -131,12 +140,13 @@ func TestGetCase_Run_Error(t *testing.T) {
 		newClient().Return(httpClient)
 
 	getCase := Case{
-		ClientBuilder:     builder,
-		HttpRequestMethod: GET,
-		URL:               "https://example.com",
-		RequestHeaders:    []RequestHeader{},
-		ExpectStatus:      200,
-		ExpectedHeaders:   []ExpectedHeader{},
+		ClientBuilder:        builder,
+		HttpRequestMethod:    GET,
+		URL:                  "https://example.com",
+		RequestHeaders:       []RequestHeader{},
+		ExpectStatus:         200,
+		ExpectedHeaders:      []ExpectedHeader{},
+		ExpectedResponseTime: ExpectedResponseTimeOf(ResponseTime(3 * time.Second)),
 	}
 
 	caseResult, err := getCase.Run()
