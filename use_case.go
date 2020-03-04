@@ -1,5 +1,7 @@
 package httpmon
 
+import "time"
+
 type CaseResult struct {
 	Success   bool
 	Failed    []Comparison
@@ -34,6 +36,14 @@ func (c *Config) newClient() HttpClient {
 	return NewHttpClient(c.RequestTimeout)
 }
 
+type ExpectStatus func() HttpResponseStatus
+
+func ExpectStatusOf(status int) ExpectStatus {
+	return func() HttpResponseStatus {
+		return HttpResponseStatus(status)
+	}
+}
+
 type RequestHeader struct {
 	Name  HttpHeaderName
 	Value HttpHeaderValue
@@ -46,18 +56,18 @@ type ExpectedHeader struct {
 
 type ExpectedResponseTime func() ResponseTime
 
-func ExpectedResponseTimeOf(t ResponseTime) ExpectedResponseTime {
+func ExpectedResponseTimeOf(t time.Duration) ExpectedResponseTime {
 	return func() ResponseTime {
-		return t
+		return ResponseTime(t)
 	}
 }
 
 type Case struct {
 	ClientBuilder
 	HttpRequestMethod
-	URL             HttpRequestURL
-	RequestHeaders  []RequestHeader
-	ExpectStatus    HttpResponseStatus
+	URL            HttpRequestURL
+	RequestHeaders []RequestHeader
+	ExpectStatus
 	ExpectedHeaders []ExpectedHeader
 	ExpectedResponseTime
 }
@@ -70,8 +80,8 @@ func (c *Case) Run() (CaseResult, error) {
 		return CaseResult{}, err
 	}
 	result := newEmptyCaseResult()
-	if c.ExpectStatus.IsValidValue() {
-		status := test.ExpectStatus(c.ExpectStatus)
+	if c.ExpectStatus != nil {
+		status := test.ExpectStatus(c.ExpectStatus())
 		result.Append(status)
 	}
 	for _, hdr := range c.ExpectedHeaders {

@@ -24,7 +24,7 @@ func TestGetCase_NewRequest_WithoutHeader(t *testing.T) {
 		HttpRequestMethod: GET,
 		URL:               "https://example.com/test",
 		RequestHeaders:    []RequestHeader{},
-		ExpectStatus:      200,
+		ExpectStatus:      ExpectStatusOf(200),
 		ExpectedHeaders:   []ExpectedHeader{},
 	}
 
@@ -51,7 +51,7 @@ func TestGetCase_NewRequest_WithHeader(t *testing.T) {
 				Value: "Bearer 11aa22bb33cc44dd55ee6f",
 			},
 		},
-		ExpectStatus:    200,
+		ExpectStatus:    ExpectStatusOf(200),
 		ExpectedHeaders: []ExpectedHeader{},
 	}
 
@@ -107,14 +107,14 @@ func TestGetCase_Run_Success(t *testing.T) {
 		HttpRequestMethod: GET,
 		URL:               "https://example.com",
 		RequestHeaders:    []RequestHeader{},
-		ExpectStatus:      200,
+		ExpectStatus:      ExpectStatusOf(200),
 		ExpectedHeaders: []ExpectedHeader{
 			{
 				Name:  "content-type",
 				Value: "application/json",
 			},
 		},
-		ExpectedResponseTime: ExpectedResponseTimeOf(ResponseTime(3 * time.Second)),
+		ExpectedResponseTime: ExpectedResponseTimeOf(3 * time.Second),
 	}
 
 	caseResult, err := getCase.Run()
@@ -144,9 +144,9 @@ func TestGetCase_Run_Error(t *testing.T) {
 		HttpRequestMethod:    GET,
 		URL:                  "https://example.com",
 		RequestHeaders:       []RequestHeader{},
-		ExpectStatus:         200,
+		ExpectStatus:         ExpectStatusOf(200),
 		ExpectedHeaders:      []ExpectedHeader{},
-		ExpectedResponseTime: ExpectedResponseTimeOf(ResponseTime(3 * time.Second)),
+		ExpectedResponseTime: ExpectedResponseTimeOf(3 * time.Second),
 	}
 
 	caseResult, err := getCase.Run()
@@ -182,7 +182,7 @@ func TestCase_Run_Failure(t *testing.T) {
 		HttpRequestMethod: GET,
 		URL:               "https://example.com",
 		RequestHeaders:    []RequestHeader{},
-		ExpectStatus:      200,
+		ExpectStatus:      ExpectStatusOf(200),
 		ExpectedHeaders: []ExpectedHeader{
 			{
 				Name:  "Content-Type",
