@@ -39,7 +39,7 @@ var Options = struct {
 
 func main() {
 	app := createApplication()
-	code := runApplication(app, os.Args...)
+	code := runApplication(app, os.Args)
 	os.Exit(int(code))
 }
 
@@ -57,7 +57,7 @@ func createApplication() *cli.App {
 				Aliases:     []string{"X"},
 				Usage:       "http method",
 				Required:    false,
-				Value:       "GetMethod",
+				Value:       "GET",
 				Destination: &method,
 			},
 			&cli.StringFlag{
@@ -86,7 +86,7 @@ func createApplication() *cli.App {
 			},
 			&cli.StringSliceFlag{
 				Name:     Options.ExpectHeader,
-				Aliases:  []string{"h"},
+				Aliases:  []string{"eh"},
 				Usage:    "expecting header (format name=value)",
 				Required: false,
 			},
@@ -135,6 +135,9 @@ func (sus *InvalidUserInputSuspension) Error() string {
 }
 
 type ErrorInExecution struct {
+	url      httpmon.HttpRequestURL
+	method   string
+	timeout  string
 	delegate error
 }
 
@@ -147,7 +150,19 @@ func (err *ErrorInExecution) Describe() {
 }
 
 func (err *ErrorInExecution) Error() string {
-	return fmt.Sprintf("Execution error\n%v", err.delegate)
+	var buffer bytes.Buffer
+	buffer.WriteString(fmt.Sprintf("Execution error %s %s", err.method, err.url))
+	buffer.WriteString("\n")
+	if gerr, ok := err.delegate.(*httpmon.GoStandardError); ok {
+		if gerr.IsTimeout() {
+			buffer.WriteString(fmt.Sprintf("timeout: %s", err.timeout))
+		} else {
+			buffer.WriteString(gerr.Error())
+		}
+	} else {
+		buffer.WriteString(err.Error())
+	}
+	return buffer.String()
 }
 
 type TestFailed struct {
@@ -160,7 +175,7 @@ func (f *TestFailed) AsError() error {
 }
 
 func (f *TestFailed) Describe() {
-	fmt.Println(f.Error())
+	fmt.Print(f.Error())
 }
 
 func (f *TestFailed) Error() string {
@@ -168,9 +183,9 @@ func (f *TestFailed) Error() string {
 	buffer.WriteString(fmt.Sprintf("%s failed (success: %d / tests: %d)", f.url, f.count-len(f.Failure), f.count))
 	buffer.WriteString("\n")
 	for i, c := range f.Failure {
-		buffer.WriteString(fmt.Sprintf("%d:", i+1))
+		buffer.WriteString(fmt.Sprintf("%d:\n", i+1))
 		buffer.WriteString(c.String())
-		buffer.WriteString("\n\n")
+		buffer.WriteString("\n")
 	}
 	return buffer.String()
 }
@@ -211,7 +226,7 @@ func createAction(method, timeout, response string, status int) Action {
 	if status < 100 || 600 <= status {
 		es = append(es, &httpmon.UserError{
 			ItemName:   "http status",
-			Reason:     "invalid status",
+			Reason:     "invalid status code is present",
 			InputValue: status,
 		})
 	}
@@ -233,7 +248,7 @@ func createAction(method, timeout, response string, status int) Action {
 		if context.NArg() != 1 {
 			es = append(es, &httpmon.UserError{
 				ItemName:   "url",
-				Reason:     "no url",
+				Reason:     "no url is given",
 				InputValue: "<no url>",
 			})
 		}
@@ -258,7 +273,12 @@ func createAction(method, timeout, response string, status int) Action {
 		}
 		result, err := testCase.Run()
 		if err != nil {
-			return &ErrorInExecution{delegate: err}
+			return &ErrorInExecution{
+				url:      url,
+				method:   method,
+				timeout:  timeout,
+				delegate: err,
+			}
 		}
 
 		count := result.TestCount
@@ -350,7 +370,7 @@ func parseTime(itemName, t string) (*Time, error) {
 	if !pattern.MatchString(t) {
 		return nil, &httpmon.UserError{
 			ItemName:   itemName,
-			Reason:     "invalid format",
+			Reason:     "invalid format, expected numberUNIT format(ex. 20s number:20, unit:s, means 20 sec)",
 			InputValue: t,
 		}
 	}
@@ -358,7 +378,7 @@ func parseTime(itemName, t string) (*Time, error) {
 	if n == "" {
 		return nil, &httpmon.UserError{
 			ItemName:   itemName,
-			Reason:     "invalid number",
+			Reason:     "invalid number, expected numberUNIT format(ex. 20s number:20, unit:s, means 20 sec)",
 			InputValue: t,
 		}
 	}
@@ -366,7 +386,7 @@ func parseTime(itemName, t string) (*Time, error) {
 	if err != nil || number == 0 {
 		return nil, &httpmon.UserError{
 			ItemName:   itemName,
-			Reason:     "invalid number",
+			Reason:     "invalid number, expected numberUNIT format(ex. 20s number:20, unit:s, means 20 sec)",
 			InputValue: t,
 		}
 	}
@@ -374,7 +394,7 @@ func parseTime(itemName, t string) (*Time, error) {
 	if u == "" {
 		return nil, &httpmon.UserError{
 			ItemName:   itemName,
-			Reason:     "invalid unit",
+			Reason:     "invalid unit, expected numberUNIT format(ex. 20s number:20, unit:s, means 20 sec)",
 			InputValue: t,
 		}
 	}
@@ -383,7 +403,7 @@ func parseTime(itemName, t string) (*Time, error) {
 	if err != nil {
 		return nil, &httpmon.UserError{
 			ItemName:   itemName,
-			Reason:     "invalid unit",
+			Reason:     "invalid unit, expected numberUNIT format(ex. 20s number:20, unit:s, means 20 sec)",
 			InputValue: t,
 		}
 	}
@@ -436,7 +456,7 @@ func parseHeaders(itemName string, headers []string) ([]Header, error) {
 		if len(s) > 2 {
 			return nil, &httpmon.UserError{
 				ItemName:   itemName,
-				Reason:     "invalid format",
+				Reason:     "invalid format, expected header-name=header-value(ex. accept=application/json)",
 				InputValue: h,
 			}
 		}
@@ -444,7 +464,7 @@ func parseHeaders(itemName string, headers []string) ([]Header, error) {
 		if n == "" {
 			return nil, &httpmon.UserError{
 				ItemName:   itemName,
-				Reason:     "invalid header name",
+				Reason:     "invalid header name, expected header-name=header-value(ex. accept=application/json)",
 				InputValue: h,
 			}
 		}
@@ -457,7 +477,7 @@ func parseHeaders(itemName string, headers []string) ([]Header, error) {
 	return hs, nil
 }
 
-func runApplication(app *cli.App, arguments ...string) ExitCode {
+func runApplication(app *cli.App, arguments []string) ExitCode {
 	err := app.Run(arguments)
 	if err != nil {
 		if _, ok := err.(*InvalidUserInputSuspension); ok {

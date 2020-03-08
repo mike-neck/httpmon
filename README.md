@@ -26,7 +26,7 @@ test failed: 1 failed in 1 cases
 supported methods
 ---
 
-* [ ] GET
+* [x] GET
 * [ ] POST
 * [ ] PUT
 * [ ] DELETE

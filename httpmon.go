@@ -40,6 +40,7 @@ func NewHttpRequestMethod(method string) (HttpRequestMethod, error) {
 	}
 	return nil, &UserError{
 		ItemName:   "RequestMethod",
+		Reason:     "not been implemented or invalid http method",
 		InputValue: method,
 	}
 }

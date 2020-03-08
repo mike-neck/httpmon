@@ -2,6 +2,7 @@ package httpmon
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 	"time"
 )
@@ -66,7 +67,14 @@ type GoStandardError struct {
 }
 
 func (err *GoStandardError) Error() string {
-	return fmt.Sprintf("%s: %v", err.Tag, err.Original)
+	return fmt.Sprintf("%s: (%v)", err.Tag, err.Original)
+}
+
+func (err *GoStandardError) IsTimeout() bool {
+	if gerr, ok := err.Original.(net.Error); ok {
+		return gerr.Timeout()
+	}
+	return false
 }
 
 // GoHttpClient limits go's standard http client only to its Do function.
