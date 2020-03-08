@@ -3,6 +3,7 @@ package httpmon
 import (
 	"fmt"
 	"io"
+	"strings"
 	"time"
 )
 
@@ -27,6 +28,30 @@ var POST HttpRequestMethod = func(url HttpRequestURL) HttpRequest {
 		HttpHeader:      header,
 		HttpRequestBody: nil,
 	}
+}
+
+func NewHttpRequestMethod(method string) (HttpRequestMethod, error) {
+	lower := strings.ToLower(method)
+	if lower == "get" {
+		return GET, nil
+	}
+	if lower == "post" {
+		return POST, nil
+	}
+	return nil, &UserError{
+		ItemName:   "RequestMethod",
+		InputValue: method,
+	}
+}
+
+type UserError struct {
+	ItemName   string
+	Reason     string
+	InputValue interface{}
+}
+
+func (ue *UserError) Error() string {
+	return fmt.Sprintf("input error: [%s = %v], by %s", ue.ItemName, ue.InputValue, ue.Reason)
 }
 
 ////////
