@@ -91,7 +91,7 @@ func createApplication() *cli.App {
 				Required: false,
 			},
 			&cli.StringSliceFlag{
-				Name:     "request-header",
+				Name:     Options.RequestHeader,
 				Aliases:  []string{"H"},
 				Usage:    "request header(format name=value)",
 				Required: false,
@@ -239,7 +239,7 @@ func createAction(method, timeout, response string, status int) Action {
 			es = append(es, err)
 		}
 
-		rhs := context.StringSlice("request-header")
+		rhs := context.StringSlice(Options.RequestHeader)
 		requestHeaders, err := parseRequestHeaders(rhs)
 		if err != nil {
 			es = append(es, err)
