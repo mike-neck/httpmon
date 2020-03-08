@@ -23,10 +23,23 @@ status
 test failed: 1 failed in 1 cases
 ```
 
+options
+---
+
+- `-method` (`-X` for short) - HTTP Method [supporting methods](https://github.com/mike-neck/httpmon#supported-methods)
+- `-request-header` - Request HTTP Header.
+    - format: `[header-name]=[header-value]` (ex. `content-type=application/json`)
+    - Can be specified multiple times.
+- `-timeout`(`-t` for short) - Timeout for http client
+    - format: numberUNIT (ex. `5m` means 5 minutes, `30s` means 30 seconds)
+- `-status` (`-s` for short) - Expecting HTTP Status.
+- `-response-time`(`-r` for short) - Expecting Response time within. Format is the same as timeout.
+- `-expect-header` - Expecting HTTP Response header. Format is the same as request header.
+
 supported methods
 ---
 
-* [ ] GET
+* [x] GET
 * [ ] POST
 * [ ] PUT
 * [ ] DELETE

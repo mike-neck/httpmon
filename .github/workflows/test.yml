@@ -17,12 +17,30 @@ jobs:
         uses: actions/setup-go@v1
         with:
           go-version: 1.13
+
       - name: Checkout
         uses: actions/checkout@v2
-#      - name: Lint
-#        run: |
-#          GO111MODULE=off GOBIN=$(pwd)/bin go get golang.org/x/lint/golint
-#          bin/golint -set_exit_status ./...
-#        if: "matrix.os == 'ubuntu-latest' || matrix.os == 'macOS-latest'"
+
+      - name: Install gomock
+        run:  go get github.com/golang/mock/mockgen@latest
+        env:
+          GOPATH: ${{ runner.temp }}/go
+          GO111MODULE: on
+
       - name: Run Tests
-        run: make check
+        run: make test
+        env:
+          GOPATH: ${{ runner.temp }}/go
+
+      - name: Generate coverage
+        run: make coverage
+        if: always()
+        env:
+          GOPATH: ${{ runner.temp }}/go
+
+      - name: Store report
+        uses: actions/upload-artifact@v1
+        if: always()
+        with:
+          name: test-report-${{ matrix.os }}
+          path: build/test-report.html

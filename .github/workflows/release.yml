@@ -1,7 +1,7 @@
 name: release
 
 on:
-  create:
+  push:
     tags:
       - v*
 
@@ -16,20 +16,11 @@ jobs:
           go-version: 1.13
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Build
-        run: make build
-      - name: Setup ghr
+
+      - name: release app
+        uses: goreleaser/goreleaser-action@v1
+        with:
+          version: latest
+          args: release --release-notes=RELEASE_NOTES.md
         env:
-          GO11MODULE: on
-          GOPATH: /home/runner/tools
-        run: go get -u github.com/tcnksm/ghr
-      - name: Release
-        env:
-          GOPATH: /home/runner/tools
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          export CREATE_EVENT_REF_TYPE=$(jq --raw-output .ref_type "$GITHUB_EVENT_PATH")
-          export TAGNAME=$(jq --raw-output .ref "$GITHUB_EVENT_PATH")
-          echo $TAG_NAME
-          if [ "$CREATE_EVENT_REF_TYPE" != "tag" ]; then echo "ref_type is not a tag: ${CREATE_EVENT_REF_TYPE}" && exit 78; fi
-          $GOPATH/bin/ghr -n ${TAG_NAME} -b "Release ${TAG_NAME}" -draft ${TAG_NAME} build/release/

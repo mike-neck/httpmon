@@ -1,34 +1,30 @@
-.PHONY: build-cli-mac
-build-cli-mac:
-	cd cmd/httpmon && GOOS=darwin GOARCH=amd64 go build -o ../../build/mac/http-mon ./...
+.PHONY: mkdir-build
+mkdir-build:
+	if [ ! -d build ]; then mkdir build; fi
 
-.PHONY: build-cli-win
-build-cli-win:
-	cd cmd/httpmon && GOOS=windows GOARCH=amd64 go build -o ../../build/win/http-mon.exe ./...
-
-.PHONY: build-cli-linux
-build-cli-linux:
-	cd cmd/httpmon && GOOS=linux GOARCH=amd64 go build -o ../../build/linux/http-mon ./...
-
-.PHONY: build
-build: build-cli-linux build-cli-mac build-cli-win
-	mkdir build/release
-	zip build/release/http-mon-darwin-amd64.zip build/mac/http-mon
-	zip build/release/http-mon-win-amd64.zip build/win/http-mon.exe
-	zip build/release/http-mon-linux-amd64.zip build/linux/http-mon
+.PHONY: test-gen
+test-gen:
+	${GOPATH}/bin/mockgen -source=client.go -package=httpmon -destination=./client_mock.go
+	${GOPATH}/bin/mockgen -source=use_case.go -package=httpmon -destination=./use_case_mock.go
+	${GOPATH}/bin/mockgen -source=httpmon.go -package=httpmon -destination=./httpmon_mock.go
 
 .PHONY: test-cli
 test-cli:
 	cd cmd/httpmon && go test ./...
 
 .PHONY: test
-test:
-	go test ./...
+test: mkdir-build test-gen
+	go test -coverprofile=build/test-report.txt
+
+.PHONY: coverage
+coverage:
+	go tool cover -html=build/test-report.txt -o build/test-report.html
 
 .PHONY: clean
 clean:
 	go clean
 	rm -rf build
+	ls | grep _mock | xargs rm
 	cd cmd/httpmon && go clean
 
 .PHONY: check
